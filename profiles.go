@@ -19,18 +19,29 @@ type ProfileConfig struct {
 	NetBirdConfig []*NetbirdTask                `yaml:"netbird,omitempty"`
 }
 
+type TaskStartReport struct {
+	ProfileID int    `json:"profileID,omitempty"`
+	AgentID   string `json:"agentID,omitempty"`
+	TaskID    int    `json:"taskID,omitempty"`
+	Name      string `json:"name,omitempty"`
+	StartTime string `json:"start_time,omitempty"`
+}
+
 type TaskReport struct {
-	Name    string `json:"name"`
-	Failed  bool   `json:"failed"`
-	EndTime string `json:"end_time"`
-	StdOut  string `json:"std_out"`
-	StdErr  string `json:"std_err"`
+	Name      string `json:"name"`
+	Failed    bool   `json:"failed"`
+	Timeout   bool   `json:"timeout,omitempty"`
+	StartTime string `json:"start_time,omitempty"`
+	EndTime   string `json:"end_time"`
+	StdOut    string `json:"std_out"`
+	StdErr    string `json:"std_err"`
 }
 
 type ProfileReport struct {
 	ProfileID int          `json:"profileID,omitempty"`
 	AgentID   string       `json:"agentID,omitempty"`
 	Success   bool         `json:"success,omitempty"`
+	Timeout   bool         `json:"timeout,omitempty"`
 	Error     string       `json:"error,omitempty"`
 	Tasks     []TaskReport `json:"tasks"`
 }
