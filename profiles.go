@@ -17,6 +17,7 @@ type ProfileConfig struct {
 	WinGetConfig  *wingetcfg.WinGetCfg          `yaml:"config,omitempty"`
 	AnsibleConfig []*ansiblecfg.AnsiblePlaybook `yaml:"ansible,omitempty"`
 	NetBirdConfig []*NetbirdTask                `yaml:"netbird,omitempty"`
+	Timeout       int                           `yaml:"timeout,omitempty"`
 }
 
 type TaskStartReport struct {
