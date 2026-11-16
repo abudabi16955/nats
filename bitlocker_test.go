@@ -215,3 +215,51 @@ func TestBitLockerRotateConfirmationJSON(t *testing.T) {
 		t.Fatalf("unexpected rotatedAt: %v", camelParsed.RotatedAt)
 	}
 }
+
+func TestBitLockerEscrowResponseJSON(t *testing.T) {
+	// Success response
+	respSuccess := NewBitLockerEscrowSuccessResponse()
+	data, err := json.Marshal(respSuccess)
+	if err != nil {
+		t.Fatalf("failed to marshal BitLockerEscrowResponse: %v", err)
+	}
+
+	var parsed BitLockerEscrowResponse
+	if err := json.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("failed to unmarshal BitLockerEscrowResponse: %v", err)
+	}
+	if !parsed.Success {
+		t.Errorf("expected success true, got false")
+	}
+	if parsed.Error != "" {
+		t.Errorf("expected empty error, got %s", parsed.Error)
+	}
+
+	// Error response
+	respErr := NewBitLockerEscrowErrorResponse("database connection failed")
+	dataErr, err := json.Marshal(respErr)
+	if err != nil {
+		t.Fatalf("failed to marshal error BitLockerEscrowResponse: %v", err)
+	}
+
+	var parsedErr BitLockerEscrowResponse
+	if err := json.Unmarshal(dataErr, &parsedErr); err != nil {
+		t.Fatalf("failed to unmarshal error BitLockerEscrowResponse: %v", err)
+	}
+	if parsedErr.Success {
+		t.Errorf("expected success false, got true")
+	}
+	if parsedErr.Error != "database connection failed" {
+		t.Errorf("expected error message mismatch, got %s", parsedErr.Error)
+	}
+
+	// Test PascalCase / alt keys
+	altJSON := []byte(`{"Success": true, "Error": ""}`)
+	var parsedAlt BitLockerEscrowResponse
+	if err := json.Unmarshal(altJSON, &parsedAlt); err != nil {
+		t.Fatalf("failed to unmarshal alt BitLockerEscrowResponse: %v", err)
+	}
+	if !parsedAlt.Success {
+		t.Errorf("expected success true from alt json")
+	}
+}

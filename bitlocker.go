@@ -49,6 +49,22 @@ type BitLockerEscrowRequest struct {
 	CreatedAt        time.Time `json:"created_at,omitempty"`
 }
 
+// BitLockerEscrowResponse represents a response returned by the server when an agent escrows a BitLocker recovery key.
+type BitLockerEscrowResponse struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error,omitempty"`
+}
+
+// NewBitLockerEscrowSuccessResponse creates a successful escrow response.
+func NewBitLockerEscrowSuccessResponse() BitLockerEscrowResponse {
+	return BitLockerEscrowResponse{Success: true}
+}
+
+// NewBitLockerEscrowErrorResponse creates an error escrow response.
+func NewBitLockerEscrowErrorResponse(err string) BitLockerEscrowResponse {
+	return BitLockerEscrowResponse{Success: false, Error: err}
+}
+
 // BitLockerForceEscrowRequest represents a command sent to an agent to trigger immediate escrow of BitLocker keys.
 type BitLockerForceEscrowRequest struct {
 	AgentID     string `json:"agent_id,omitempty"`
@@ -102,6 +118,30 @@ func parseFlexibleTime(raw []byte) (time.Time, error) {
 }
 
 // UnmarshalJSON supports snake_case, camelCase, and flexible time formats.
+// UnmarshalJSON supports snake_case and Pascal/camelCase for BitLockerEscrowResponse.
+func (r *BitLockerEscrowResponse) UnmarshalJSON(data []byte) error {
+	type Alias BitLockerEscrowResponse
+	aux := struct {
+		*Alias
+		SuccessAlt *bool  `json:"Success"`
+		ErrorAlt   string `json:"Error"`
+	}{
+		Alias: (*Alias)(r),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	if aux.SuccessAlt != nil {
+		r.Success = *aux.SuccessAlt
+	}
+	if r.Error == "" && aux.ErrorAlt != "" {
+		r.Error = aux.ErrorAlt
+	}
+	return nil
+}
+
 func (r *BitLockerEscrowRequest) UnmarshalJSON(data []byte) error {
 	type Alias BitLockerEscrowRequest
 	aux := struct {
